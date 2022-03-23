@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_barcode_flutter/app/code-reader/code_reader.dart';
+import 'package:qrcode_barcode_flutter/app/code-reader/code_reader_view.dart';
+import 'package:qrcode_barcode_flutter/app/code-reader/pagamento_view.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class AppWidget extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const CodeReader(),
+      home: const PagamentoView(),
     );
   }
 }
