@@ -36,7 +36,7 @@ abstract class _PagamentoModel with Store {
   int? maxLength;
 
   @action
-  setLinhaDigitavel(value) => linhaDigitavel = value;
+  setLinhaDigitavel(String value) => linhaDigitavel = value;
 
   @action
   setValorPagar(value) => valorPagar = value;
@@ -71,19 +71,20 @@ abstract class _PagamentoModel with Store {
 
   @action
   validateTipoPagamento() {
+    print("Linha digitavel: ${linhaDigitavel[0]}");
     if (linhaDigitavel != null && linhaDigitavel != "") {
       if (linhaDigitavel[0] == 8) {
         setTipo('convenio');
         setMaxLength(56);
         setPlaceHolder(
             "___________-_ ___________-_ ___________-_ ___________-_");
-        setMask("99999999999-9 99999999999-9 99999999999-9 99999999999-9");
+        setMask("###########-# ###########-# ###########-# ###########-#");
       } else {
         setTipo('titulo');
         setMaxLength(55);
         setPlaceHolder(
             "_____._____ _____.______ _____.______ _ ______________");
-        setMask("99999.99999 99999.999999 99999.999999 9 99999999999999");
+        setMask("#####.##### #####.###### #####.###### # ##############");
       }
     }
   }

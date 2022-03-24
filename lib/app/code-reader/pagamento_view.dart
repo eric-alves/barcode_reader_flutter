@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:qrcode_barcode_flutter/app/code-reader/pagamento_controller.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class PagamentoView extends StatefulWidget {
   const PagamentoView({Key? key}) : super(key: key);
@@ -10,6 +12,14 @@ class PagamentoView extends StatefulWidget {
 
 class _PagamentoViewState extends State<PagamentoView> {
   int _index = 0;
+  PagamentoController pagamentoController = PagamentoController();
+  TextEditingController _linhaDigitavel = TextEditingController();
+  MaskTextInputFormatter convenioMask = MaskTextInputFormatter(
+      mask: "###########-# ###########-# ###########-# ###########-#",
+      filter: {"#": RegExp(r'[0-9]')});
+  MaskTextInputFormatter tituloMask = MaskTextInputFormatter(
+      mask: "###########-# ###########-# ###########-# ###########-#",
+      filter: {"#": RegExp(r'[0-9]')});
 
   @override
   Widget build(BuildContext context) {
@@ -50,27 +60,58 @@ class _PagamentoViewState extends State<PagamentoView> {
                 alignment: Alignment.center,
                 child: Column(
                   children: [
-                    Observer(builder: (_) {
-                      return TextFormField(
-                          // controller: _usernameController,
+                    Observer(
+                      builder: (_) {
+                        // _linhaDigitavel.text =
+                        //     pagamentoController.pagamento.linhaDigitavel;
+
+                        return TextFormField(
+                          controller: _linhaDigitavel,
+                          // inputFormatters:
+                          //     pagamentoController.pagamento.tipo == "covenio"
+                          //         ? [convenioMask]
+                          //         : [tituloMask],
                           obscureText: false,
+                          maxLines: 3,
+                          minLines: 1,
+                          onChanged: (value) {
+                            pagamentoController.pagamento
+                                .setLinhaDigitavel(value);
+                            pagamentoController.pagamento
+                                .validateTipoPagamento();
+                          },
+
                           decoration: InputDecoration(
                             icon: IconButton(
-                              onPressed: () {},
+                              onPressed: pagamentoController.readBarcode,
                               icon: Icon(Icons.qr_code),
                             ),
+                            counter: TextButton(
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.all(0),
+                                primary: Colors.black45,
+                                textStyle: const TextStyle(fontSize: 16),
+                              ),
+                              onPressed: pagamentoController.colarClipBoard,
+                              child: const Text('Colar código'),
+                            ),
                             errorText: null,
-                            labelText: 'Linha Digitável',
+                            labelText: 'Código de barras',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
-                          validator: null);
-                    }),
+                          validator: null,
+                        );
+                      },
+                    ),
                     SizedBox(
                       height: 5,
                     ),
-                    Text("Clique no ícone para ler o código de barras.")
+                    Observer(builder: (_) {
+                      return Text(
+                          "${pagamentoController.pagamento.linhaDigitavel} // ${pagamentoController.pagamento.tipo}");
+                    })
                   ],
                 ),
               ),

@@ -163,7 +163,7 @@ mixin _$PagamentoModel on _PagamentoModel, Store {
       ActionController(name: '_PagamentoModel');
 
   @override
-  dynamic setLinhaDigitavel(dynamic value) {
+  dynamic setLinhaDigitavel(String value) {
     final _$actionInfo = _$_PagamentoModelActionController.startAction(
         name: '_PagamentoModel.setLinhaDigitavel');
     try {
