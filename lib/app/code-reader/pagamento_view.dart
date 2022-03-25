@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
 import 'package:qrcode_barcode_flutter/app/code-reader/pagamento_controller.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -12,17 +13,27 @@ class PagamentoView extends StatefulWidget {
 
 class _PagamentoViewState extends State<PagamentoView> {
   int _index = 0;
-  PagamentoController pagamentoController = PagamentoController();
+  // PagamentoController pagamentoController = PagamentoController();
   TextEditingController _linhaDigitavel = TextEditingController();
   MaskTextInputFormatter convenioMask = MaskTextInputFormatter(
       mask: "###########-# ###########-# ###########-# ###########-#",
       filter: {"#": RegExp(r'[0-9]')});
   MaskTextInputFormatter tituloMask = MaskTextInputFormatter(
-      mask: "###########-# ###########-# ###########-# ###########-#",
+      mask: "#####.##### #####.###### #####.###### # ##############",
       filter: {"#": RegExp(r'[0-9]')});
+  late MaskTextInputFormatter maskAtiva;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    maskAtiva = convenioMask;
+  }
 
   @override
   Widget build(BuildContext context) {
+    var pagamentoController = Provider.of<PagamentoController>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Pagamento"),
@@ -55,54 +66,70 @@ class _PagamentoViewState extends State<PagamentoView> {
           steps: <Step>[
             Step(
               isActive: _index >= 0,
-              title: const Text('DADOS BÁSICOS'),
+              title: const Text(
+                'DADOS BÁSICOS',
+                style: TextStyle(
+                  fontSize: 8,
+                ),
+              ),
               content: Container(
                 alignment: Alignment.center,
                 child: Column(
                   children: [
+                    SizedBox(
+                      height: 20,
+                    ),
                     Observer(
                       builder: (_) {
                         // _linhaDigitavel.text =
                         //     pagamentoController.pagamento.linhaDigitavel;
 
-                        return TextFormField(
-                          controller: _linhaDigitavel,
-                          // inputFormatters:
-                          //     pagamentoController.pagamento.tipo == "covenio"
-                          //         ? [convenioMask]
-                          //         : [tituloMask],
-                          obscureText: false,
-                          maxLines: 3,
-                          minLines: 1,
-                          onChanged: (value) {
-                            pagamentoController.pagamento
-                                .setLinhaDigitavel(value);
-                            pagamentoController.pagamento
-                                .validateTipoPagamento();
-                          },
+                        if (pagamentoController
+                                .pagamento.linhaDigitavel.length ==
+                            1) {
+                          pagamentoController.pagamento.tipo == "convenio"
+                              ? maskAtiva = convenioMask
+                              : maskAtiva = tituloMask;
+                        }
 
-                          decoration: InputDecoration(
-                            icon: IconButton(
-                              onPressed: pagamentoController.readBarcode,
-                              icon: Icon(Icons.qr_code),
-                            ),
-                            counter: TextButton(
-                              style: TextButton.styleFrom(
-                                padding: const EdgeInsets.all(0),
-                                primary: Colors.black45,
-                                textStyle: const TextStyle(fontSize: 16),
-                              ),
-                              onPressed: pagamentoController.colarClipBoard,
-                              child: const Text('Colar código'),
-                            ),
-                            errorText: null,
-                            labelText: 'Código de barras',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                          validator: null,
-                        );
+                        return pagamentoController.pagamento.tipo == null ||
+                                pagamentoController.pagamento.tipo == ""
+                            ? Container()
+                            : TextFormField(
+                                controller: _linhaDigitavel,
+                                inputFormatters: [maskAtiva],
+                                obscureText: false,
+                                maxLines: 3,
+                                minLines: 1,
+                                onChanged: (value) {
+                                  pagamentoController.pagamento
+                                      .setLinhaDigitavel(value);
+                                  // pagamentoController.pagamento
+                                  //     .validateTipoPagamento();
+                                },
+                                decoration: InputDecoration(
+                                  icon: IconButton(
+                                    onPressed: pagamentoController.readBarcode,
+                                    icon: Icon(Icons.qr_code),
+                                  ),
+                                  counter: TextButton(
+                                    style: TextButton.styleFrom(
+                                      padding: const EdgeInsets.all(0),
+                                      primary: Colors.black45,
+                                      textStyle: const TextStyle(fontSize: 16),
+                                    ),
+                                    onPressed:
+                                        pagamentoController.colarClipBoard,
+                                    child: const Text('Colar código'),
+                                  ),
+                                  errorText: null,
+                                  labelText: 'Linha Digitável',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                validator: null,
+                              );
                       },
                     ),
                     SizedBox(
@@ -118,7 +145,12 @@ class _PagamentoViewState extends State<PagamentoView> {
             ),
             Step(
               isActive: _index >= 1,
-              title: Text('COMPROVANTE'),
+              title: Text(
+                'COMPROVANTE',
+                style: TextStyle(
+                  fontSize: 8,
+                ),
+              ),
               content: Text('Content for Step 2'),
             ),
           ],

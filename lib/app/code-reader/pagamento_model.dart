@@ -69,18 +69,17 @@ abstract class _PagamentoModel with Store {
     return linhaDigitavel != null && linhaDigitavel != "";
   }
 
+  // linha digitavel e codigo de barras do convenio é sempre a msm coisa
+
   @action
   validateTipoPagamento() {
-    print("Linha digitavel: ${linhaDigitavel[0]}");
     if (linhaDigitavel != null && linhaDigitavel != "") {
-      if (linhaDigitavel[0] == 8) {
-        setTipo('convenio');
+      if (tipo == "convenio") {
         setMaxLength(56);
         setPlaceHolder(
             "___________-_ ___________-_ ___________-_ ___________-_");
         setMask("###########-# ###########-# ###########-# ###########-#");
       } else {
-        setTipo('titulo');
         setMaxLength(55);
         setPlaceHolder(
             "_____._____ _____.______ _____.______ _ ______________");
